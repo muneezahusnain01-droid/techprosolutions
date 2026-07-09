@@ -1,0 +1,235 @@
+@import 'tailwindcss';
+
+/* ============================================================
+   TechProSolutions — Design Tokens
+   Bold Editorial · warm identity.
+   Light default = "Clay & Petrol" (terracotta + petrol on warm paper)
+   Dark theme    = "Ember" (terracotta on espresso)
+   Tokens are mapped through runtime CSS vars so themes swap live.
+   ============================================================ */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-accent: var(--accent);
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+
+  /* Fluid editorial display sizes */
+  --text-display: clamp(2.75rem, 7vw, 6rem);
+  --text-display-sm: clamp(2.25rem, 5vw, 4rem);
+}
+
+/* ---- Light: Clay & Petrol (default) ---- */
+:root {
+  --bg: #f2ece1;
+  --surface: #ece4d6;
+  --surface-2: #e5dbc9;
+  --border: #dccfba;
+  --text: #23201d;
+  --muted: #6a625a;
+  --brand: #c25a38; /* terracotta */
+  --brand-600: #a94a2c;
+  --brand-700: #8a3c24;
+  --accent: #1e5457; /* petrol */
+}
+
+/* ---- Dark: Ember ---- */
+:root[data-theme='dark'] {
+  --bg: #1e1a17;
+  --surface: #26221e;
+  --surface-2: #2e2924;
+  --border: #38312a;
+  --text: #ece3d6;
+  --muted: #9a8e80;
+  --brand: #d2734b; /* terracotta, lifted for dark */
+  --brand-600: #bd6039;
+  --brand-700: #9c4d2c;
+  --accent: #4a9ea2; /* petrol, lifted for dark */
+}
+
+/* Follow the OS when the user hasn't chosen (no data-theme set) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #1e1a17;
+    --surface: #26221e;
+    --surface-2: #2e2924;
+    --border: #38312a;
+    --text: #ece3d6;
+    --muted: #9a8e80;
+    --brand: #d2734b;
+    --brand-600: #bd6039;
+    --brand-700: #9c4d2c;
+    --accent: #4a9ea2;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.03em;
+    line-height: 1.02;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-brand) 45%, transparent);
+    color: #fff;
+  }
+}
+
+/* ============================================================
+   Editorial utilities
+   ============================================================ */
+
+/* Fine top hairline that fades out — sits above section dividers */
+@utility hairline {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-border) 15%,
+    var(--color-border) 85%,
+    transparent
+  );
+}
+
+/* Uppercase micro-label used throughout the editorial layout */
+@utility eyebrow {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* Big outlined index numerals (01 / 02 / 03) */
+@utility numeral {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--color-muted) 45%, transparent);
+}
+
+/* Marquee (client / tech strips) */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee 32s linear infinite;
+}
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 10%,
+    #000 90%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 10%,
+    #000 90%,
+    transparent
+  );
+}
+
+/* Fanned card gallery (Voyager-style) */
+.card-fan {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 0.5rem 0 1.5rem;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.card-fan::-webkit-scrollbar {
+  display: none;
+}
+.card-fan > * {
+  scroll-snap-align: center;
+  flex: 0 0 auto;
+}
+.fan-card {
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.5s ease;
+}
+@media (min-width: 1024px) {
+  .card-fan {
+    overflow: visible;
+    justify-content: center;
+    gap: 0;
+    padding-bottom: 0;
+  }
+  .card-fan > * + * {
+    margin-left: -2.75rem;
+  }
+  .fan-card {
+    transform: rotate(var(--r, 0deg)) translateY(var(--y, 0));
+  }
+  .card-fan:hover .fan-card {
+    filter: brightness(0.72);
+  }
+  .card-fan .fan-card:hover {
+    transform: rotate(0deg) translateY(-1.5rem) scale(1.05);
+    filter: brightness(1);
+    z-index: 40;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fan-card {
+    transition: none;
+  }
+}
+
+/* Fade/slide-in on load */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-fade-up {
+    animation: none;
+  }
+}
